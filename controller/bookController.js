@@ -12,6 +12,9 @@ class BookController {
                 author,
                 summary
             };
+            const existingBook = await bookModel.findOne({ title });
+            if (existingBook) return response.status(400).send({ code: 400, message: 'A book with the same title already exists' });
+
             const savedData = await new bookModel(bookData).save();
             if (savedData) return response.status(201).send({ code: 201, message: 'New Book Added Successfully.', book: savedData });
             else return response.status(500).send({ code: 500, message: 'Failed to add new book' });
@@ -29,6 +32,10 @@ class BookController {
             const findBook = await bookModel.findOne({ _id: bookId });
             if (findBook === null) return response.status(404).send({ code: 404, message: 'No book found.' });
             else {
+                const existingBook = await bookModel.findOne({ title });
+                if (existingBook) {
+                    return response.status(400).send({ code: 400, message: 'A book with the same title already exists' });
+                }
                 const updateBook = await bookModel.updateOne({ _id: bookId }, {
                     $set: {
                         title: title,
